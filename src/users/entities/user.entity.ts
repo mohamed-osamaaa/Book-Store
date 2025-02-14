@@ -1,6 +1,5 @@
 import { OrderEntity } from 'src/orders/entities/order.entity';
 import { ReviewEntity } from 'src/reviews/entities/review.entity';
-import { Roles } from 'src/utility/common/user-roles.enum';
 import {
   Column,
   CreateDateColumn,
@@ -11,6 +10,10 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+export enum UserRole {
+  ADMIN = 'ADMIN',
+  USER = 'USER',
+}
 @Entity('users')
 export class UserEntity {
   @PrimaryGeneratedColumn()
@@ -21,8 +24,14 @@ export class UserEntity {
   email: string;
   @Column({ select: false })
   password: string;
-  @Column({ type: 'enum', enum: Roles, array: true, default: [Roles.USER] })
-  roles: Roles[];
+  // @Column({ type: 'enum', enum: Roles, array: true, default: [Roles.USER] })
+  // roles: Roles[];
+  @Column({
+    type: 'set',
+    enum: UserRole,
+    default: [UserRole.USER],
+  })
+  roles: UserRole[];
 
   @CreateDateColumn()
   createdAt: Timestamp;

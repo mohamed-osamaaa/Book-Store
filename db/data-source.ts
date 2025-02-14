@@ -8,7 +8,7 @@ export const dataSourceOptions: DataSourceOptions = {
   port: Number(process.env.DB_PORT),
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
-  database: 'typeorm',
+  database: 'book-store',
   entities: ['dist/**/*.entity.js'],
   migrations: ['dist/db/migrations/*{.ts,.js}'],
   synchronize: false,

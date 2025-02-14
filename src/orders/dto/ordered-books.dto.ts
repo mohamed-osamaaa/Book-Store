@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, IsPositive } from 'class-validator';
 
-export class OrderedProductsDto {
+export class OrderedBooksDto {
   @IsNotEmpty({ message: 'Product can not be empty.' })
   id: number;
 

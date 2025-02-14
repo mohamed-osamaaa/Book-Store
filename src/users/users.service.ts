@@ -71,7 +71,10 @@ export class UsersService {
       throw new BadRequestException('You are not allowed to modify roles.');
     }
 
-    await this.usersRepository.update(id, updateUserDto);
+    // Remove roles before updating
+    const { roles, ...updatedData } = updateUserDto;
+
+    await this.usersRepository.update(id, updatedData);
     return this.findOne(id);
   }
 

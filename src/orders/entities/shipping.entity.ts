@@ -25,7 +25,7 @@ export class ShippingEntity {
   @Column()
   postCode: string;
 
-  @OneToOne(() => OrderEntity, (order) => order.shipping, {
+  @OneToOne(() => OrderEntity, (order) => order.shippingAddress, {
     onDelete: 'CASCADE',
   })
   @JoinColumn() // This ensures `orderId` is the foreign key in the `shippings` table
