@@ -1,8 +1,11 @@
+import { OrderEntity } from 'src/orders/entities/order.entity';
+import { ReviewEntity } from 'src/reviews/entities/review.entity';
 import { Roles } from 'src/utility/common/user-roles.enum';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   Timestamp,
   UpdateDateColumn,
@@ -25,4 +28,8 @@ export class UserEntity {
   createdAt: Timestamp;
   @UpdateDateColumn()
   updatedAt: Timestamp;
+  @OneToMany(() => OrderEntity, (order) => order.updatedBy)
+  ordersUpdateBy: OrderEntity[];
+  @OneToMany(() => ReviewEntity, (rev) => rev.user)
+  reviews: ReviewEntity[];
 }

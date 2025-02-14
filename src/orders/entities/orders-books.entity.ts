@@ -1,4 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BookEntity } from 'src/books/entities/book.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+
+import { OrderEntity } from './order.entity';
 
 @Entity({ name: 'orders_books' })
 export class OrdersBooksEntity {
@@ -10,4 +13,13 @@ export class OrdersBooksEntity {
 
   @Column()
   quantity: number;
+  @ManyToOne(() => OrderEntity, (order) => order.orderBook, {
+    onDelete: 'CASCADE',
+  })
+  order: OrderEntity;
+
+  @ManyToOne(() => BookEntity, (book) => book.orderBook, {
+    onDelete: 'CASCADE',
+  })
+  book: BookEntity;
 }

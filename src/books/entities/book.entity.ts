@@ -1,7 +1,13 @@
+import { AuthorEntity } from 'src/authors/entities/author.entity';
+import { CategoryEntity } from 'src/categories/entities/category.entity';
+import { OrdersBooksEntity } from 'src/orders/entities/orders-books.entity';
+import { ReviewEntity } from 'src/reviews/entities/review.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Timestamp,
   UpdateDateColumn,
@@ -23,4 +29,13 @@ export class BookEntity {
   createdAt: Timestamp;
   @UpdateDateColumn()
   updatedAt: Timestamp;
+  @ManyToOne(() => AuthorEntity, (author) => author.bookComposesBy)
+  ComposesBy: AuthorEntity;
+  @ManyToOne(() => CategoryEntity, (cat) => cat.book)
+  category: CategoryEntity;
+  @OneToMany(() => ReviewEntity, (rev) => rev.book)
+  reviews: ReviewEntity[];
+  // @ManyToMany(()=>OrderEntity,(order)=>order.) => this wrong
+  @OneToMany(() => OrdersBooksEntity, (orderBook) => orderBook.book)
+  orderBook: OrdersBooksEntity[];
 }

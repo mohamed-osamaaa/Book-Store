@@ -1,4 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+
+import { OrderEntity } from './order.entity';
 
 @Entity({ name: 'shippings' })
 export class ShippingEntity {
@@ -16,4 +24,10 @@ export class ShippingEntity {
 
   @Column()
   postCode: string;
+
+  @OneToOne(() => OrderEntity, (order) => order.shipping, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn() // This ensures `orderId` is the foreign key in the `shippings` table
+  order: OrderEntity;
 }

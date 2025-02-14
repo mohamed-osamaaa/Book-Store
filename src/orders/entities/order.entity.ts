@@ -1,12 +1,18 @@
+import { UserEntity } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   Timestamp,
 } from 'typeorm';
 
 import { OrderStatus } from '../enums/order-status.enum';
+import { OrdersBooksEntity } from './orders-books.entity';
+import { ShippingEntity } from './shipping.entity';
 
 @Entity({ name: 'orders' })
 export class OrderEntity {
@@ -27,4 +33,12 @@ export class OrderEntity {
 
   @Column({ nullable: true })
   deliveredAt: Date;
+  @OneToMany(() => OrdersBooksEntity, (orderBook) => orderBook.order)
+  orderBook: OrdersBooksEntity[];
+  @ManyToOne(() => UserEntity, (user) => user.ordersUpdateBy)
+  updatedBy: UserEntity;
+  @OneToOne(() => ShippingEntity, (shipping) => shipping.order, {
+    cascade: true,
+  })
+  shipping: ShippingEntity;
 }

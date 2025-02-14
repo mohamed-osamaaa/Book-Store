@@ -1,7 +1,9 @@
+import { BookEntity } from 'src/books/entities/book.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   Timestamp,
   UpdateDateColumn,
@@ -19,4 +21,6 @@ export class CategoryEntity {
   createdAt: Timestamp;
   @UpdateDateColumn()
   updatedAt: Timestamp;
+  @ManyToOne(() => BookEntity, (book) => book.category)
+  book: BookEntity;
 }
