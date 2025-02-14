@@ -52,7 +52,7 @@ export class UsersController {
     return await this.usersService.findAll();
   }
 
-  @Get('single/:id')
+  @Get(':id')
   async findOne(
     @Param('id') id: string,
   ): Promise<Omit<UserEntity, 'password'> | null> {
