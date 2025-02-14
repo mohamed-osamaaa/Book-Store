@@ -6,12 +6,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
-import { CurrentUserMiddleware } from './utility/middlewares/current-user.middleware';
 import { BooksModule } from './books/books.module';
 import { CategoriesModule } from './categories/categories.module';
-import { ReviewsModule } from './reviews/reviews.module';
 import { OrdersModule } from './orders/orders.module';
+import { ReviewsModule } from './reviews/reviews.module';
+import { UsersModule } from './users/users.module';
+import { CurrentUserMiddleware } from './utility/middlewares/current-user.middleware';
 
 @Module({
   imports: [
