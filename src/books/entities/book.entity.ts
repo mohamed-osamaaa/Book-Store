@@ -7,14 +7,18 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('authors')
-export class AuthorEntity {
+@Entity('books')
+export class BookEntity {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
-  name: string;
+  title: string;
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  price: number;
+  @Column({ default: 0 })
+  stock: number;
   @Column()
-  bio: string;
+  published_date: Date;
   @CreateDateColumn()
   createdAt: Timestamp;
   @UpdateDateColumn()

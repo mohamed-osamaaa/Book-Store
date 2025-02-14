@@ -7,14 +7,14 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('authors')
-export class AuthorEntity {
+@Entity('categories')
+export class CategoryEntity {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
   name: string;
   @Column()
-  bio: string;
+  description: string;
   @CreateDateColumn()
   createdAt: Timestamp;
   @UpdateDateColumn()
