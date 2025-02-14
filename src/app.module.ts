@@ -11,6 +11,7 @@ import { CurrentUserMiddleware } from './utility/middlewares/current-user.middle
 import { BooksModule } from './books/books.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ReviewsModule } from './reviews/reviews.module';
     BooksModule,
     CategoriesModule,
     ReviewsModule,
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
