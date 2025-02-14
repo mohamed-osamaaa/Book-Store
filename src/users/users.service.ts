@@ -54,7 +54,6 @@ export class UsersService {
     const { password, ...userWithoutPassword } = userExists;
     return userWithoutPassword;
   }
-
   async findAll(): Promise<UserEntity[]> {
     return await this.usersRepository.find();
   }
@@ -64,16 +63,15 @@ export class UsersService {
     if (!user) throw new NotFoundException('User not found.');
     return user;
   }
-
   async update(id: number, updateUserDto: UpdateUserDto): Promise<UserEntity> {
     const user = await this.findOne(id);
+    if (!user) throw new NotFoundException('User not found.');
 
-    const updatedUser = {
-      ...updateUserDto,
-      roles: updateUserDto.roles as any,
-    };
+    if ('roles' in updateUserDto) {
+      throw new BadRequestException('You are not allowed to modify roles.');
+    }
 
-    await this.usersRepository.update(id, updatedUser);
+    await this.usersRepository.update(id, updateUserDto);
     return this.findOne(id);
   }
 
