@@ -40,5 +40,5 @@ export class OrderEntity {
   @OneToOne(() => ShippingEntity, (shipping) => shipping.order, {
     cascade: true,
   })
-  shipping: ShippingEntity;
+  shippingAddress: ShippingEntity;
 }
