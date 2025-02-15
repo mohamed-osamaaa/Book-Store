@@ -181,7 +181,7 @@ export class OrdersService {
     return `Order #${id} has been successfully removed.`;
   }
 
-  async stockUpdate(order: OrderEntity, status: string) {
+  async stockUpdate(order: OrderEntity, status: OrderStatus) {
     for (const ob of order.orderBook) {
       await this.booksService.updateStock(ob.book.id, ob.quantity, status);
     }

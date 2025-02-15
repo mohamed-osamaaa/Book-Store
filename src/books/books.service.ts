@@ -1,7 +1,7 @@
+import { AuthorEntity } from 'src/authors/entities/author.entity';
 import { CategoriesService } from 'src/categories/categories.service';
 import { OrderStatus } from 'src/orders/enums/order-status.enum';
 import { OrdersService } from 'src/orders/orders.service';
-import { UserEntity } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 
 import {
@@ -29,7 +29,7 @@ export class BooksService {
 
   async create(
     createBookDto: CreateBookDto,
-    currentUser: UserEntity,
+    currentAuthor: AuthorEntity,
   ): Promise<BookEntity> {
     const category = await this.categoryService.findOne(
       +createBookDto.categoryId,
@@ -41,7 +41,7 @@ export class BooksService {
 
     const book = this.bookRepository.create(createBookDto);
     book.category = category;
-    book.composedBy = currentUser;
+    book.ComposesBy = currentAuthor;
 
     return await this.bookRepository.save(book);
   }
@@ -132,11 +132,11 @@ export class BooksService {
   async update(
     id: number,
     updateBookDto: Partial<UpdateBookDto>,
-    currentUser: UserEntity,
+    currentAuthor: AuthorEntity,
   ): Promise<BookEntity> {
     const book = await this.findOne(id);
     Object.assign(book, updateBookDto);
-    book.composedBy = currentUser;
+    book.ComposesBy = currentAuthor;
 
     if (updateBookDto.categoryId) {
       const category = await this.categoryService.findOne(
