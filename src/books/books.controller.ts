@@ -1,7 +1,8 @@
+import { BooksService } from 'src/books/books.service';
 import { Roles } from 'src/utility/common/user-roles.enum';
-import { AuthorizeRoles } from 'src/utility/decorators/authorize-roles.decorator';
 import { AuthenticationGuard } from 'src/utility/guards/authentication.guard';
 import { AuthorizeGuard } from 'src/utility/guards/authorization.guard';
+import { SerializeIncludes } from 'src/utility/interceptors/serialize.interceptor';
 
 import {
   Body,
@@ -11,46 +12,49 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 
-import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
+import { BookEntity } from './entities/book.entity';
 
 @Controller('books')
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
 
-  @AuthorizeRoles(Roles.ADMIN)
   @UseGuards(AuthenticationGuard, AuthorizeGuard([Roles.ADMIN]))
   @Post()
-  create(@Body() createBookDto: CreateBookDto) {
-    return this.booksService.create(createBookDto);
+  async create(@Body() createBookDto: CreateBookDto): Promise<BookEntity> {
+    return await this.booksService.create(createBookDto);
   }
 
-  @UseGuards(AuthenticationGuard)
+  @SerializeIncludes(BookEntity)
   @Get()
-  findAll() {
-    return this.booksService.findAll();
+  async findAll(
+    @Query() query: any,
+  ): Promise<{ books: BookEntity[]; totalBooks: number; limit: number }> {
+    return await this.booksService.findAll(query);
   }
 
-  @UseGuards(AuthenticationGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.booksService.findOne(+id);
+  async findOne(@Param('id') id: string): Promise<BookEntity> {
+    return await this.booksService.findOne(+id);
   }
 
-  @AuthorizeRoles(Roles.ADMIN)
+  @UseGuards(AuthenticationGuard, AuthorizeGuard([Roles.ADMIN]))
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
-    return this.booksService.update(+id, updateBookDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateBookDto: UpdateBookDto,
+  ): Promise<BookEntity> {
+    return await this.booksService.update(+id, updateBookDto);
   }
 
-  @AuthorizeRoles(Roles.ADMIN)
   @UseGuards(AuthenticationGuard, AuthorizeGuard([Roles.ADMIN]))
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.booksService.remove(+id);
+  async remove(@Param('id') id: string): Promise<BookEntity> {
+    return await this.booksService.remove(+id);
   }
 }

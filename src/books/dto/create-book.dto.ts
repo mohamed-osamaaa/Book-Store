@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CreateBookDto {
   @IsNotEmpty({ message: 'Title is required and cannot be empty.' })
@@ -12,4 +12,8 @@ export class CreateBookDto {
 
   @IsNotEmpty({ message: 'Published date is required and cannot be empty.' })
   published_date: Date;
+
+  @IsNotEmpty({ message: 'category should not be empty.' })
+  @IsNumber({}, { message: 'category id should be a number' })
+  categoryId: number;
 }
