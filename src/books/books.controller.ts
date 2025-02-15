@@ -1,5 +1,7 @@
 import { BooksService } from 'src/books/books.service';
+import { UserEntity } from 'src/users/entities/user.entity';
 import { Roles } from 'src/utility/common/user-roles.enum';
+import { CurrentUser } from 'src/utility/decorators/current-user.decorator';
 import { AuthenticationGuard } from 'src/utility/guards/authentication.guard';
 import { AuthorizeGuard } from 'src/utility/guards/authorization.guard';
 import { SerializeIncludes } from 'src/utility/interceptors/serialize.interceptor';
@@ -26,8 +28,11 @@ export class BooksController {
 
   @UseGuards(AuthenticationGuard, AuthorizeGuard([Roles.ADMIN]))
   @Post()
-  async create(@Body() createBookDto: CreateBookDto): Promise<BookEntity> {
-    return await this.booksService.create(createBookDto);
+  async create(
+    @Body() createBookDto: CreateBookDto,
+    @CurrentUser() currentUser: UserEntity,
+  ): Promise<BookEntity> {
+    return await this.booksService.create(createBookDto, currentUser);
   }
 
   @SerializeIncludes(BookEntity)
@@ -48,8 +53,9 @@ export class BooksController {
   async update(
     @Param('id') id: string,
     @Body() updateBookDto: UpdateBookDto,
+    @CurrentUser() currentUser: UserEntity,
   ): Promise<BookEntity> {
-    return await this.booksService.update(+id, updateBookDto);
+    return await this.booksService.update(+id, updateBookDto, currentUser);
   }
 
   @UseGuards(AuthenticationGuard, AuthorizeGuard([Roles.ADMIN]))

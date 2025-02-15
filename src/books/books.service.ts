@@ -1,7 +1,7 @@
-import dataSource from 'db/data-source';
 import { CategoriesService } from 'src/categories/categories.service';
 import { OrderStatus } from 'src/orders/enums/order-status.enum';
 import { OrdersService } from 'src/orders/orders.service';
+import { UserEntity } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 
 import {
@@ -27,16 +27,21 @@ export class BooksService {
     private readonly orderService: OrdersService,
   ) {}
 
-  async create(createBookDto: CreateBookDto): Promise<BookEntity> {
+  async create(
+    createBookDto: CreateBookDto,
+    currentUser: UserEntity,
+  ): Promise<BookEntity> {
     const category = await this.categoryService.findOne(
       +createBookDto.categoryId,
     );
+
     if (!category) {
       throw new NotFoundException('Category not found.');
     }
 
     const book = this.bookRepository.create(createBookDto);
     book.category = category;
+    book.composedBy = currentUser;
 
     return await this.bookRepository.save(book);
   }
@@ -45,14 +50,13 @@ export class BooksService {
     query: any,
   ): Promise<{ books: BookEntity[]; totalBooks: number; limit: number }> {
     const limit = query.limit ? Number(query.limit) : 4;
-    const queryBuilder = dataSource
-      .getRepository(BookEntity)
+    const queryBuilder = this.bookRepository
       .createQueryBuilder('book')
       .leftJoinAndSelect('book.category', 'category')
       .leftJoin('book.reviews', 'review')
       .addSelect([
         'COUNT(review.id) AS reviewCount',
-        'AVG(review.ratings)::numeric(10,2) AS avgRating',
+        'COALESCE(AVG(review.ratings), 0) AS avgRating',
       ])
       .groupBy('book.id, category.id');
 
@@ -79,13 +83,13 @@ export class BooksService {
     }
 
     if (query.minRating) {
-      queryBuilder.andHaving('AVG(review.ratings) >= :minRating', {
+      queryBuilder.having('AVG(review.ratings) >= :minRating', {
         minRating: query.minRating,
       });
     }
 
     if (query.maxRating) {
-      queryBuilder.andHaving('AVG(review.ratings) <= :maxRating', {
+      queryBuilder.having('AVG(review.ratings) <= :maxRating', {
         maxRating: query.maxRating,
       });
     }
@@ -95,7 +99,7 @@ export class BooksService {
       queryBuilder.offset(query.offset);
     }
 
-    const books = await queryBuilder.getRawMany();
+    const books = await queryBuilder.getMany();
     const totalBooks = await queryBuilder.getCount();
 
     return { books, totalBooks, limit };
@@ -103,9 +107,22 @@ export class BooksService {
 
   async findOne(id: number): Promise<BookEntity> {
     const book = await this.bookRepository.findOne({
-      where: { id },
-      relations: { category: true },
-      select: { category: { id: true, name: true } },
+      where: { id: id },
+      relations: {
+        ComposesBy: true,
+        category: true,
+      },
+      select: {
+        ComposesBy: {
+          id: true,
+          name: true,
+          // email: true,
+        },
+        category: {
+          id: true,
+          name: true,
+        },
+      },
     });
 
     if (!book) throw new NotFoundException('Book not found.');
@@ -115,9 +132,11 @@ export class BooksService {
   async update(
     id: number,
     updateBookDto: Partial<UpdateBookDto>,
+    currentUser: UserEntity,
   ): Promise<BookEntity> {
     const book = await this.findOne(id);
     Object.assign(book, updateBookDto);
+    book.composedBy = currentUser;
 
     if (updateBookDto.categoryId) {
       const category = await this.categoryService.findOne(
@@ -143,15 +162,10 @@ export class BooksService {
   async updateStock(
     id: number,
     stock: number,
-    status: string,
+    status: OrderStatus,
   ): Promise<BookEntity> {
-    let book = await this.findOne(id);
-    if (status === OrderStatus.DELIVERED) {
-      book.stock -= stock;
-    } else {
-      book.stock += stock;
-    }
-
+    const book = await this.findOne(id);
+    book.stock += status === OrderStatus.DELIVERED ? -stock : stock;
     return await this.bookRepository.save(book);
   }
 }
