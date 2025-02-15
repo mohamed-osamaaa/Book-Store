@@ -24,7 +24,7 @@ export class CategoriesService {
   }
 
   async findOne(id: number): Promise<CategoryEntity> {
-    const category = await this.categoryRepository.findOneBy({ id });
+    const category = await this.categoryRepository.findOne({ where: { id } });
     if (!category) throw new NotFoundException('Category not found.');
     return category;
   }
@@ -34,7 +34,6 @@ export class CategoriesService {
     fields: Partial<UpdateCategoryDto>,
   ): Promise<CategoryEntity> {
     const category = await this.findOne(id);
-    if (!category) throw new NotFoundException('Category not found.');
     Object.assign(category, fields);
     return await this.categoryRepository.save(category);
   }
