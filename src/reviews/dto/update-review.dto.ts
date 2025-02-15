@@ -1,6 +1,10 @@
-import { IsOptional, MaxLength, MinLength } from 'class-validator';
+import { IsNumber, IsOptional, MaxLength, MinLength } from 'class-validator';
 
 export class UpdateReviewDto {
+  @IsOptional({ message: 'Product should not be empty.' })
+  @IsNumber({}, { message: 'Product Id should be number' })
+  bookId: number;
+
   @IsOptional()
   @MinLength(1, { message: 'rating minimum character should be 1.' })
   @MaxLength(5, { message: 'rating maximum character should be 5.' })
