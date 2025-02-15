@@ -79,27 +79,34 @@ export class OrdersService {
     return await this.orderRepository.find({
       relations: {
         shippingAddress: true,
-        user: true,
-        products: { product: true },
+        updatedBy: true,
+        orderBook: { order: true },
       },
     });
   }
 
   async findOne(id: number): Promise<OrderEntity> {
-    return await this.orderRepository.findOne({
+    const order = await this.orderRepository.findOne({
       where: { id },
-      relations: {
-        shippingAddress: true,
-        user: true,
-        products: { product: true },
-      },
+      relations: [
+        'shippingAddress',
+        'updatedBy',
+        'orderBook',
+        'orderBook.order',
+      ],
     });
+
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${id} not found`);
+    }
+
+    return order;
   }
 
-  async findOneByProductId(id: number) {
-    return await this.opRepository.findOne({
-      relations: { product: true },
-      where: { product: { id: id } },
+  async findOneByBookId(id: number) {
+    return await this.obRepository.findOne({
+      relations: { book: true },
+      where: { book: { id: id } },
     });
   }
 
@@ -166,7 +173,7 @@ export class OrdersService {
     }
 
     // Remove associated order products
-    await this.opRepository.delete({ order: { id } });
+    await this.obRepository.delete({ order: { id } });
 
     // Remove the order itself
     await this.orderRepository.delete(id);
@@ -175,12 +182,8 @@ export class OrdersService {
   }
 
   async stockUpdate(order: OrderEntity, status: string) {
-    for (const op of order.products) {
-      await this.productService.updateStock(
-        op.product.id,
-        op.product_quantity,
-        status,
-      );
+    for (const ob of order.orderBook) {
+      await this.booksService.updateStock(ob.book.id, ob.quantity, status);
     }
   }
 }
